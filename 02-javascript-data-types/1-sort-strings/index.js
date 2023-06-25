@@ -4,20 +4,15 @@
  * @param {string} [param="asc"] param - the sorting type "asc" or "desc"
  * @returns {string[]}
  */
+
+const sortCallback = (a, b, param) => {
+  const [first, second] = param === 'asc' ? [a, b] : [b, a];
+    
+  return first.localeCompare(second, 'ru', {caseFirst: 'upper'}); 
+};
+  
 export function sortStrings(arr, param = 'asc') {
   const newArr = [...arr];
 
-  const sortCallback = (a, b) => {
-    let first = a;
-    let second = b;
-
-    if (param !== 'asc') {
-      first = b;
-      second = a;
-    }
-    
-    return first.localeCompare(second, 'ru', {caseFirst: 'upper'}); 
-  };
-
-  return newArr.sort(sortCallback);
+  return newArr.sort((a, b) => sortCallback(a, b, param));
 }
