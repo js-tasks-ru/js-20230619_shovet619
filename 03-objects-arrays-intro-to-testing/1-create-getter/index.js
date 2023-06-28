@@ -5,6 +5,14 @@
  */
 export function createGetter(path) {
   const pathParts = path.split('.');
+  let index = 0;
 
-  return (obj) => pathParts.reduce((obj, path) => !obj ? undefined : obj[path], obj);
+  const getter = (obj) => {
+    if (!obj[pathParts[index]]) {
+      return typeof obj === "object" ? undefined : obj;
+    }
+    return getter(obj[pathParts[index++]]);
+  };
+
+  return getter;
 }
