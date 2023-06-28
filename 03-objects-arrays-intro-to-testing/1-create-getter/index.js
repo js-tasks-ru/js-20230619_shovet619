@@ -4,5 +4,7 @@
  * @returns {function} - function-getter which allow get value from object by set path
  */
 export function createGetter(path) {
+  const pathParts = path.split('.');
 
+  return (obj) => pathParts.reduce((obj, path) => !obj ? undefined : obj[path], obj);
 }
