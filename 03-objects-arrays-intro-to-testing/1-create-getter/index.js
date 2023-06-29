@@ -9,7 +9,10 @@ export function createGetter(path) {
 
   const getter = (obj) => {
     if (!obj[pathParts[index]]) {
-      return typeof obj === "object" ? undefined : obj;
+      return;
+    }
+    if (index === pathParts.length - 1) {
+      return obj[pathParts[index]];
     }
     return getter(obj[pathParts[index++]]);
   };
