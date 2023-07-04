@@ -1,13 +1,12 @@
 export default class ColumnChart {
   element = null;
-  classNamePrefix = "column-chart";
 
   constructor(options = {}) {
     const {
       data = [], 
-      value, 
-      link, 
-      label, 
+      value = "", 
+      link = "", 
+      label = "", 
       formatHeading, 
       chartHeight = 50
     } = options;
@@ -22,69 +21,91 @@ export default class ColumnChart {
   }
 
   update(data) {
-    const oldChart = this.element.getElementsByClassName("column-chart__container")[0];
-    const newChart = this.drawChart(data, this.value);
-    this.element.replaceChild(newChart, oldChart);
+    const oldChartElement = this.element.getElementsByClassName("column-chart__container")[0];
+    const newChartElement = this.drawChart(data, this.value);
+    this.element.replaceChild(newChartElement, oldChartElement);
   }
 
   render() {
-    const containerClassName = this.data.length === 0 ? `${this.classNamePrefix}_loading ${this.classNamePrefix}` : this.classNamePrefix;
-    const columnChart = document.createElement('div');
-    columnChart.className = containerClassName;
+    const rootElement = this.createRootElement();
+    const titleElement = this.createTitleElement(this.label);
+    if (this.link) {
+      const linkElement = this.createLinkElement(this.link);
+      titleElement.append(linkElement);
+    }
 
-    const title = this.createElementWithClassname("div", "title");
-    title.innerHTML = this.label;
+    const chartElement = this.drawChart(this.data, this.value, this.formatHeading);
 
-    const link = this.createLink();
+    rootElement.appendChild(titleElement);
+    rootElement.appendChild(chartElement);
 
-    if (link) {title.appendChild(link);}
-
-    const chart = this.drawChart(this.data, this.value);
-
-    columnChart.appendChild(title);
-    columnChart.appendChild(chart);
-
-    this.element = columnChart;
+    this.element = rootElement;
   }
 
-  drawChart(data, title) {    
-    const container = this.createElementWithClassname("div", "container");
-
-    const header = this.createElementWithClassname("div", "header");
-    header.innerHTML = this.formatHeading ? this.formatHeading(title) : title;
-   
-    const chart = this.createElementWithClassname("div", "chart");
-
-    container.appendChild(header);
+  drawChart(data, title, formatHeading) {    
+    const chartContainerElement = this.creatChartContainerElement();
+    const headerElement = this.createHeaderElement(formatHeading, title);
+    const chartElement = this.createChartElement();
+    chartContainerElement.appendChild(headerElement);
 
     data.forEach((value) => {
-      const column = document.createElement("div");
-      const columnValue = this.getColumnValue(value);
-      const columnPercent = this.getColumnPercent(value);
-      column.style = `--value: ${columnValue}`;
-      column.setAttribute('data-tooltip', columnPercent);
-      chart.appendChild(column);
+      const columnElement = this.createColumnElement(value);
+      chartElement.appendChild(columnElement);
     });
-    container.appendChild(chart);
 
-    return container;
+    chartContainerElement.appendChild(chartElement);
+    return chartContainerElement;
   }
 
-  createLink() {
-    if (!this.link) {return;}
-
-    const link = this.createElementWithClassname("a", "link");
-    link.innerText = "View all";
-    link.href = this.link;
-    return link;
-  }
-  
-  createElementWithClassname(tag, className = "") {
-    const element = document.createElement(tag);
-    element.className = this.createClassName(className);
-    return element;
+  createRootElement() {
+    const className = this.data.length === 0 ? "column-chart_loading column-chart" : "column-chart";
+    const rootElement = document.createElement("div");
+    rootElement.className = className;
+    return rootElement;
   }
 
+  createColumnElement(value) {
+    const columnElement = document.createElement("div");
+    const columnValue = this.getColumnValue(value);
+    const columnPercent = this.getColumnPercent(value);
+    columnElement.style = `--value: ${columnValue}`;
+    columnElement.setAttribute('data-tooltip', columnPercent);
+    return columnElement;
+  }
+
+  createChartElement() {
+    const chartElement = document.createElement("div");
+    chartElement.className = "column-chart__chart";
+    return chartElement;
+  }
+
+  creatChartContainerElement() {
+    const chartContainerElement = document.createElement("div");
+    chartContainerElement.className = "column-chart__container";
+    return chartContainerElement;
+  }
+
+  createLinkElement(link) {
+    const linkElement = document.createElement("div");
+    linkElement.className = "column-chart__link";
+    linkElement.innerText = "View all";
+    linkElement.href = link;
+    return linkElement;
+  }
+
+  createTitleElement(label) {
+    const titleElement = document.createElement("div");
+    titleElement.className = "column-chart__title";
+    titleElement.innerHTML = label;
+    return titleElement;
+  }
+
+  createHeaderElement(formatHeading, title) {
+    const headerElement = document.createElement("div");
+    headerElement.className = "column-chart__header";
+    headerElement.innerHTML = formatHeading ? formatHeading(title) : title;
+    return headerElement;
+  }
 
   destroy() {
     this.element = null;
@@ -102,9 +123,4 @@ export default class ColumnChart {
   getColumnPercent(value) {
     return (value / Math.max(...this.data) * 100).toFixed(0) + '%';
   }
-
-  createClassName(name) {
-    return `${this.classNamePrefix}__${name}`;
-  }
-
 }
