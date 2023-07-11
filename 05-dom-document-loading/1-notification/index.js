@@ -1,4 +1,5 @@
 export default class NotificationMessage {
+  static uniqueElement = null;
   element = null
 
   constructor(message = "", options = {}) {
@@ -14,8 +15,14 @@ export default class NotificationMessage {
   }
 
   show(targetElement = document.body) {
+    if (NotificationMessage.uniqueElement) {
+      NotificationMessage.uniqueElement.remove();
+    }
     targetElement.append(this.element);
-    this.remove();
+    NotificationMessage.uniqueElement = this.element;
+    setTimeout(() => {
+      this.remove();
+    }, this.duration);
   }
 
   destroy() {
@@ -23,9 +30,7 @@ export default class NotificationMessage {
   }
 
   remove() {
-    setTimeout(() => {
-      this.element.remove();
-    }, this.duration);
+    this.element.remove();
   }
 
   createMessageElement(message, type, duration) {
