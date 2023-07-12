@@ -16,15 +16,15 @@ export default class SortableTable {
     this.element = rootElement;
     this.subElements = {
       body: this.element.firstElementChild.children[1]
-    }
+    };
   }
 
   update() {
     if (!this.root) {
-      this.root = this.element.parentNode
+      this.root = this.element.parentNode;
     }
-    this.render()
-    this.root.replaceChild(this.element, this.root.firstChild)
+    this.render();
+    this.root.replaceChild(this.element, this.root.firstChild);
   }
 
   createRootElement(header, table) {
@@ -45,16 +45,16 @@ export default class SortableTable {
     return `
       <div data-element="header" class="sortable-table__header sortable-table__row">
         ${headerConfig.map(item => `
-            <div class="sortable-table__cell" data-id="${item.id}" data-sortable="${item.sortable}" data-order="asc">
+            <div class="sortable-table__cell" data-id="${item.id}" data-sortable="${item.sortable}">
             <span>${item.title}</span>
             ${item.sortable 
-              ? `<span data-element="arrow" class="sortable-table__sort-arrow">
+    ? `<span data-element="arrow" class="sortable-table__sort-arrow">
                   <span class="sort-arrow"></span>
                 </span>` 
-              : ""}
+    : ""}
           </div>
             `
-          ).join(' ')}
+  ).join(' ')}
       </div>
     `;
   }
@@ -62,37 +62,43 @@ export default class SortableTable {
   createTableBody(data) {
     return `
       <div data-element="body" class="sortable-table__body">
-          ${data.map(item => `
+          ${data.map(item => this.createTableRow(item)).join(" ")}
+      </div>
+    `;
+  }
+
+  createTableRow(item) {
+    return (
+      `
             <a href="/products/${item.id}" class="sortable-table__row">
-              <div class="sortable-table__cell">
-                ${item.images?.map(image => `
-                    <img class="sortable-table-image" alt="Image" src="${image.url}">
-                `).join(' ')}
-              </div>
+              ${this.headerConfig.map(({ id, template }) => (
+        template 
+          ? template(item[id]) 
+          : `<div class='sortable-table__cell'>${item[id]}</div>`
+      )).join('')}
               <div class="sortable-table__cell">${item.title}</div>
       
               <div class="sortable-table__cell">${item.quantity}</div>
               <div class="sortable-table__cell">${item.price}</div>
               <div class="sortable-table__cell">${item.sales}</div>
             </a>
-          `).join(' ')}
-      </div>
-    `;
+          `
+    );
   }
 
   sort(fieldValue, orderValue) {
-    const sortType = this.headerConfig.find(item => item.id === fieldValue).sortType
+    const sortType = this.headerConfig.find(item => item.id === fieldValue).sortType;
     const sortAscending = (a, b) => a[fieldValue] - b[fieldValue];
     const sortDescending = (a, b) => b[fieldValue] - a[fieldValue];
     const sortStringAscending = (a, b) => a[fieldValue].localeCompare(b[fieldValue], "ru");
     const sortStringDescending = (a, b) => b[fieldValue].localeCompare(a[fieldValue], "ru");
     
     if (sortType === "number") {
-      this.data.sort(orderValue === "asc" ? sortAscending : sortDescending)
+      this.data.sort(orderValue === "asc" ? sortAscending : sortDescending);
     } else {
-      this.data.sort(orderValue === "asc" ? sortStringAscending : sortStringDescending)
+      this.data.sort(orderValue === "asc" ? sortStringAscending : sortStringDescending);
     }
-    this.update()
+    this.update();
   }
 
   destroy() {
