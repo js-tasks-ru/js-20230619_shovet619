@@ -45,8 +45,8 @@ export default class NotificationMessage {
         </div>
     </div>
     `;
-    const messageElement = document.createElement('template');
+    const messageElement = document.createElement('div');
     messageElement.innerHTML = template.trim();
-    return messageElement.content.firstChild;
+    return messageElement.firstChild;
   }
 }
