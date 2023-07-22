@@ -13,6 +13,7 @@ export default class SortableTable {
     this.data = data;
     this.sorted = sorted;
     this.render();
+
   }
 
   render() {
@@ -32,10 +33,12 @@ export default class SortableTable {
   }
 
   update() {
+
     if (!this.root) {
       this.root = this.element.parentNode;
     }
     const tableBodyElement = this.element.querySelector('[data-element="body"]');
+
     const tableHTML = this.createTableBody(this.data);
     tableBodyElement.innerHTML = tableHTML;
   }

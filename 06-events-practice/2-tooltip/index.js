@@ -2,6 +2,7 @@ class Tooltip {
   static tooltip = null
   element = null
   mounted = false
+  listeners = []
 
   constructor() {
     if (Tooltip.tooltip) {return Tooltip.tooltip;}
@@ -49,15 +50,31 @@ class Tooltip {
   }
 
   addListeners() {
-    document.addEventListener("pointerover", this.onMoveIn.bind(this));
-    document.addEventListener("pointerout", this.onMoveOut.bind(this));
-    document.addEventListener('mousemove', this.onMouseMove.bind(this));
+    const pointerOverHandler = this.onMoveIn.bind(this);
+    const pointerOutHandler = this.onMoveOut.bind(this);
+    const mouseMoveHandler = this.onMouseMove.bind(this);
+
+    this.listeners = [
+      {
+        type: "pointerover",
+        handler: pointerOverHandler
+      },
+      {
+        type: "pointerout",
+        handler: pointerOutHandler
+      },
+      {
+        type: "mousemove",
+        handler: mouseMoveHandler
+      },
+    ];
+
+    this.listeners.forEach(({type, handler}) => document.addEventListener(type, handler));
+    
   }
 
   removeListeners() {
-    document.removeEventListener("pointerover", this.onMoveIn.bind(this));
-    document.removeEventListener("pointerout", this.onMoveOut.bind(this));
-    document.removeEventListener('mousemove', this.onMouseMove.bind(this));
+    this.listeners.forEach(({ type, handler }) => document.removeEventListener(type, handler));
   }
 
   remove() {
