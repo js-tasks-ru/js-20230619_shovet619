@@ -41,7 +41,7 @@ export default class ColumnChart {
     }
 
     initialize() {
-      document.addEventListener("update-chart", this.render);
+      document.addEventListener("update-chart", this.updateElement);
       const chartElement = document.createElement("div");
       chartElement.innerHTML = this.template.trim();
       this.element = chartElement.firstChild;
@@ -49,8 +49,12 @@ export default class ColumnChart {
       this.update();
     }
 
-    render = () => {
-      this.subElements.body.innerHTML = this.drawChart();
+    render = (container) => {
+      container.append(this.element);
+    }
+
+    updateElement = () => {
+      this.subElements.body.innerHTML = this.createChartTemplate();
     }
 
     initializeSubElements() {
@@ -68,14 +72,14 @@ export default class ColumnChart {
           <div data-element="container" class="column-chart__container">
             <div data-element="header" class="column-chart__header">${this.value}</div>
             <div data-element="body" class="column-chart__chart">
-              ${this.drawChart()}
+              ${this.createChartTemplate()}
             </div>
           </div>
         </div>
       `;
     }
 
-    drawChart() {
+    createChartTemplate() {
       return this.data
         .map((value) => 
           `<div 
@@ -91,7 +95,7 @@ export default class ColumnChart {
 
     destroy() {
       this.remove();
-      document.removeEventListener("update-chart", this.render);
+      document.removeEventListener("update-chart", this.updateElement);
       this.element = null;
     }
   
